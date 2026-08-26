@@ -51,6 +51,20 @@
             letter-spacing: 1px;
             color: #ffffff;
             text-shadow: 0 0 12px rgba(0, 162, 255, 0.7);
+            min-height: 40px;
+        }
+
+        /* Typewriter Cursor */
+        .cursor {
+            display: inline-block;
+            color: #00a2ff;
+            font-weight: 300;
+            margin-left: 2px;
+            animation: blink 0.7s infinite;
+        }
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
         }
 
         /* Page Display Logic */
@@ -138,10 +152,10 @@
     <!-- Credit in top right corner -->
     <div class="credits">(credits to gemini for help)</div>
 
-    <!-- Main Profile Image & Header -->
+    <!-- Main Profile Image & Dynamic Typing Header -->
     <div class="profile-container">
         <img src="avatar.jpg" class="profile-img" alt="OGAdamVR Profile">
-        <h1>OGAdamVR</h1>
+        <h1><span id="typewriter">OGAdamVR</span><span class="cursor">|</span></h1>
     </div>
 
     <!-- MAIN HOME PAGE -->
@@ -305,14 +319,50 @@
         </a>
     </div>
 
-    <!-- Navigation Script -->
+    <!-- Scripts for Navigation and Typewriter Animation -->
     <script>
+        // Page Navigation Logic
         function openPage(pageId) {
             const pages = document.querySelectorAll('.page');
             pages.forEach(page => page.classList.remove('active'));
             document.getElementById(pageId).classList.add('active');
             window.scrollTo(0, 0);
         }
+
+        // Typewriter Effect switching between OGAdamVR and Modding Hub
+        const words = ["OGAdamVR", "Modding Hub"];
+        let wordIndex = 0;
+        let charIndex = words[0].length;
+        let isDeleting = true;
+        const typewriterEl = document.getElementById('typewriter');
+
+        function typeEffect() {
+            const currentWord = words[wordIndex];
+
+            if (isDeleting) {
+                typewriterEl.textContent = currentWord.substring(0, charIndex - 1);
+                charIndex--;
+            } else {
+                typewriterEl.textContent = currentWord.substring(0, charIndex + 1);
+                charIndex++;
+            }
+
+            let speed = isDeleting ? 90 : 130;
+
+            if (!isDeleting && charIndex === currentWord.length) {
+                speed = 2200; // Pause at full word
+                isDeleting = true;
+            } else if (isDeleting && charIndex === 0) {
+                isDeleting = false;
+                wordIndex = (wordIndex + 1) % words.length;
+                speed = 400; // Pause before re-typing
+            }
+
+            setTimeout(typeEffect, speed);
+        }
+
+        // Start typing loop after 2 seconds
+        setTimeout(typeEffect, 2000);
     </script>
 
 </body>
