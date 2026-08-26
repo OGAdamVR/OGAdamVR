@@ -5,121 +5,263 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>OGAdamVR</title>
     <style>
+        * {
+            box-sizing: border-box;
+        }
         body {
-            background-color: #000000;
+            background-color: #050508;
             color: #ffffff;
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             text-align: center;
             padding: 20px;
             margin: 0;
+            min-height: 100vh;
+            position: relative;
+        }
+        
+        /* Top Corner Credits */
+        .credits {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 12px;
+            color: #777788;
+            font-style: italic;
+            letter-spacing: 0.5px;
+        }
+
+        /* Profile & Header */
+        .profile-container {
+            margin-top: 40px;
         }
         .profile-img {
-            width: 140px;
-            height: 140px;
+            width: 130px;
+            height: 130px;
             border-radius: 50%;
             border: 3px solid #ff0033;
-            box-shadow: 0 0 25px #ff0033;
-            margin-top: 20px;
+            box-shadow: 0 0 20px #ff0033, 0 0 40px rgba(255, 0, 51, 0.4);
             object-fit: cover;
         }
         h1 {
             font-size: 32px;
-            margin: 15px 0 20px 0;
-            font-weight: bold;
+            margin: 15px 0 25px 0;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-shadow: 0 0 10px rgba(255, 0, 51, 0.5);
         }
+
+        /* Page Display Logic */
         .page {
-            display: none; /* Hides pages by default */
+            display: none;
+            animation: fadeIn 0.3s ease-in-out;
         }
         .page.active {
-            display: block; /* Shows only the active page */
+            display: block;
         }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Interactive Cards */
         .card {
-            background-color: #111116;
-            border-radius: 14px;
-            padding: 16px;
-            margin: 12px auto;
-            max-width: 380px;
+            background-color: #0f0f14;
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin: 14px auto;
+            max-width: 420px;
             text-align: left;
-            border: 1px solid #22222e;
+            border: 1px solid #1f1f2e;
             text-decoration: none;
             display: block;
             cursor: pointer;
+            transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        .card:hover {
+            transform: translateY(-2px);
+            border-color: #ff0033;
+            box-shadow: 0 0 15px rgba(255, 0, 51, 0.3);
         }
         .card h3 { 
             color: #ff2a4b; 
             margin: 0 0 6px 0; 
-            font-size: 20px;
+            font-size: 18px;
+            font-weight: 700;
         }
         .card p { 
-            color: #a0a0b0; 
+            color: #9090a0; 
             margin: 0; 
-            font-size: 14px; 
+            font-size: 13px; 
+            line-height: 1.4;
         }
+
+        /* Direct Download Card Style Accent */
+        .card.download-card h3::after {
+            content: " 📥";
+            font-size: 14px;
+        }
+
+        /* Back Button */
         .back-btn {
-            background: #ff0033;
-            color: white;
-            border: none;
-            padding: 10px 20px;
+            background: transparent;
+            color: #ff2a4b;
+            border: 1px solid #ff0033;
+            padding: 8px 18px;
             border-radius: 8px;
             font-weight: bold;
             cursor: pointer;
             margin-bottom: 20px;
+            transition: background 0.2s ease, color 0.2s ease;
+        }
+        .back-btn:hover {
+            background: #ff0033;
+            color: #ffffff;
+            box-shadow: 0 0 10px rgba(255, 0, 51, 0.5);
         }
     </style>
 </head>
 <body>
 
-    <img src="your-avatar.jpg" class="profile-img" alt="OGAdamVR Avatar">
-    <h1>OGAdamVR</h1>
+    <!-- Credit in top right corner -->
+    <div class="credits">(credits to gemini for help)</div>
+
+    <div class="profile-container">
+        <img src="your-avatar.jpg" class="profile-img" alt="OGAdamVR Profile">
+        <h1>OGAdamVR</h1>
+    </div>
 
     <!-- MAIN HOME PAGE -->
     <div id="home" class="page active">
-        <!-- Click this card to open Sub Page 1 -->
-        <div class="card" onclick="openPage('page1')">
-            <h3>Frida Tools</h3>
-            <p>Click to open Frida downloads & tools</p>
+        <div class="card" onclick="openPage('standalone')">
+            <h3>Standalone mods</h3>
+            <p>Custom mods for standalone VR</p>
         </div>
 
-        <!-- Click this card to open Sub Page 2 -->
-        <div class="card" onclick="openPage('page2')">
-            <h3>Animal Company Mods</h3>
-            <p>Standalone no-PC mods for Animal Company</p>
+        <div class="card" onclick="openPage('libs')">
+            <h3>Lib files</h3>
+            <p>Library files and custom binaries</p>
+        </div>
+
+        <div class="card" onclick="openPage('adb')">
+            <h3>ADB modding</h3>
+            <p>ADB tools and modding scripts</p>
+        </div>
+
+        <div class="card" onclick="openPage('discords')">
+            <h3>Modding discords</h3>
+            <p>Community and modding Discord servers</p>
+        </div>
+
+        <div class="card" onclick="openPage('root')">
+            <h3>ROOT tools</h3>
+            <p>Root utility packages and links</p>
         </div>
     </div>
 
-    <!-- SUB PAGE 1 (Hidden until clicked) -->
-    <div id="page1" class="page">
-        <button class="back-btn" onclick="openPage('home')">← Go Back</button>
+    <!-- SUB PAGE: STANDALONE MODS (3 Links) -->
+    <div id="standalone" class="page">
+        <button class="back-btn" onclick="openPage('home')">← Back to Main Menu</button>
         
-        <a href="https://google.com" target="_blank" class="card">
-            <h3>Frida Tool #1</h3>
-            <p>Download link or details for tool 1</p>
+        <a href="https://example.com" target="_blank" class="card">
+            <h3>Standalone Mod #1</h3>
+            <p>Click to visit link 1</p>
         </a>
-        <a href="https://google.com" target="_blank" class="card">
-            <h3>Frida Tool #2</h3>
-            <p>Download link or details for tool 2</p>
+        <a href="https://example.com" target="_blank" class="card">
+            <h3>Standalone Mod #2</h3>
+            <p>Click to visit link 2</p>
         </a>
-    </div>
-
-    <!-- SUB PAGE 2 (Hidden until clicked) -->
-    <div id="page2" class="page">
-        <button class="back-btn" onclick="openPage('home')">← Go Back</button>
-
-        <a href="https://google.com" target="_blank" class="card">
-            <h3>EIC Mod</h3>
-            <p>Direct download link</p>
+        <a href="https://example.com" target="_blank" class="card">
+            <h3>Standalone Mod #3</h3>
+            <p>Click to visit link 3</p>
         </a>
     </div>
 
-    <!-- JavaScript to switch pages -->
+    <!-- SUB PAGE: LIB FILES (1 Link, 1 File Download) -->
+    <div id="libs" class="page">
+        <button class="back-btn" onclick="openPage('home')">← Back to Main Menu</button>
+
+        <a href="https://example.com" target="_blank" class="card">
+            <h3>Lib External Link</h3>
+            <p>Click to visit site</p>
+        </a>
+        <!-- Replace 'libfile.so' with the name of the file uploaded to your GitHub repository -->
+        <a href="libfile.so" download class="card download-card">
+            <h3>Download Lib File</h3>
+            <p>Direct download file</p>
+        </a>
+    </div>
+
+    <!-- SUB PAGE: ADB MODDING (1 Link, 2 File Downloads) -->
+    <div id="adb" class="page">
+        <button class="back-btn" onclick="openPage('home')">← Back to Main Menu</button>
+
+        <a href="https://example.com" target="_blank" class="card">
+            <h3>ADB Modding Link</h3>
+            <p>Click to open external link</p>
+        </a>
+        <!-- Replace filenames with files in your GitHub repository -->
+        <a href="adb-tool1.zip" download class="card download-card">
+            <h3>Download ADB Tool #1</h3>
+            <p>Direct download file 1</p>
+        </a>
+        <a href="adb-tool2.apk" download class="card download-card">
+            <h3>Download ADB Tool #2</h3>
+            <p>Direct download file 2</p>
+        </a>
+    </div>
+
+    <!-- SUB PAGE: MODDING DISCORDS (6 Links) -->
+    <div id="discords" class="page">
+        <button class="back-btn" onclick="openPage('home')">← Back to Main Menu</button>
+
+        <a href="https://discord.gg/example1" target="_blank" class="card">
+            <h3>Discord Server #1</h3>
+            <p>Join Discord community 1</p>
+        </a>
+        <a href="https://discord.gg/example2" target="_blank" class="card">
+            <h3>Discord Server #2</h3>
+            <p>Join Discord community 2</p>
+        </a>
+        <a href="https://discord.gg/example3" target="_blank" class="card">
+            <h3>Discord Server #3</h3>
+            <p>Join Discord community 3</p>
+        </a>
+        <a href="https://discord.gg/example4" target="_blank" class="card">
+            <h3>Discord Server #4</h3>
+            <p>Join Discord community 4</p>
+        </a>
+        <a href="https://discord.gg/example5" target="_blank" class="card">
+            <h3>Discord Server #5</h3>
+            <p>Join Discord community 5</p>
+        </a>
+        <a href="https://discord.gg/example6" target="_blank" class="card">
+            <h3>Discord Server #6</h3>
+            <p>Join Discord community 6</p>
+        </a>
+    </div>
+
+    <!-- SUB PAGE: ROOT TOOLS (2 Links) -->
+    <div id="root" class="page">
+        <button class="back-btn" onclick="openPage('home')">← Back to Main Menu</button>
+
+        <a href="https://example.com" target="_blank" class="card">
+            <h3>ROOT Tool Link #1</h3>
+            <p>Click to open root link 1</p>
+        </a>
+        <a href="https://example.com" target="_blank" class="card">
+            <h3>ROOT Tool Link #2</h3>
+            <p>Click to open root link 2</p>
+        </a>
+    </div>
+
+    <!-- Navigation Script -->
     <script>
         function openPage(pageId) {
-            // Hide all pages
             const pages = document.querySelectorAll('.page');
             pages.forEach(page => page.classList.remove('active'));
-
-            // Show the selected page
             document.getElementById(pageId).classList.add('active');
+            window.scrollTo(0, 0);
         }
     </script>
 
