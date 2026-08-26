@@ -105,6 +105,15 @@
             font-size: 14px;
         }
 
+        /* Static Card (Non-clickable info style) */
+        .card.info-card {
+            cursor: default;
+        }
+        .card.info-card:hover {
+            transform: none;
+            box-shadow: none;
+        }
+
         /* Back Button */
         .back-btn {
             background: transparent;
@@ -129,7 +138,7 @@
     <!-- Credit in top right corner -->
     <div class="credits">(credits to gemini for help)</div>
 
-    <!-- Main Profile Image & Header Header -->
+    <!-- Main Profile Image & Header -->
     <div class="profile-container">
         <img src="avatar.jpg" class="profile-img" alt="OGAdamVR Profile">
         <h1>OGAdamVR</h1>
@@ -137,6 +146,11 @@
 
     <!-- MAIN HOME PAGE -->
     <div id="home" class="page active">
+        <div class="card" onclick="openPage('fangame')">
+            <h3>Fangame modding</h3>
+            <p>Mods, menus, and tools for VR fangames</p>
+        </div>
+
         <div class="card" onclick="openPage('standalone')">
             <h3>Standalone mods</h3>
             <p>Custom mods for standalone VR</p>
@@ -161,6 +175,40 @@
             <h3>ROOT tools</h3>
             <p>Root utility packages and links</p>
         </div>
+
+        <div class="card" onclick="openPage('site-credits')">
+            <h3>Credits</h3>
+            <p>Site developers and contributors</p>
+        </div>
+    </div>
+
+    <!-- SUB PAGE: CREDITS -->
+    <div id="site-credits" class="page">
+        <button class="back-btn" onclick="openPage('home')">← Back to Main Menu</button>
+
+        <div class="card info-card">
+            <h3>dev</h3>
+            <p>gemini ai</p>
+        </div>
+
+        <div class="card info-card">
+            <h3>prompt giver</h3>
+            <p>OGAdamVR</p>
+        </div>
+    </div>
+
+    <!-- SUB PAGE: FANGAME MODDING (1 Link, 1 File Download) -->
+    <div id="fangame" class="page">
+        <button class="back-btn" onclick="openPage('home')">← Back to Main Menu</button>
+
+        <a href="https://example.com" target="_blank" class="card">
+            <h3>Fangame External Link</h3>
+            <p>Click to open external link</p>
+        </a>
+        <a href="fangame-mod.zip" download class="card download-card">
+            <h3>Download Fangame File</h3>
+            <p>Direct download package file</p>
+        </a>
     </div>
 
     <!-- SUB PAGE: STANDALONE MODS (3 Links) -->
