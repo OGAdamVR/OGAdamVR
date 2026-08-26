@@ -126,13 +126,16 @@
 </head>
 <body>
 
+    <!-- Credit in top right corner -->
     <div class="credits">(credits to gemini for help)</div>
 
+    <!-- Main Profile Image & Header Header -->
     <div class="profile-container">
-        <img src="your-avatar.jpg" class="profile-img" alt="OGAdamVR Profile">
+        <img src="avatar.jpg" class="profile-img" alt="OGAdamVR Profile">
         <h1>OGAdamVR</h1>
     </div>
 
+    <!-- MAIN HOME PAGE -->
     <div id="home" class="page active">
         <div class="card" onclick="openPage('standalone')">
             <h3>Standalone mods</h3>
@@ -156,10 +159,11 @@
 
         <div class="card" onclick="openPage('root')">
             <h3>ROOT tools</h3>
-<img src="avatar.jpg" class="profile-img" alt="OGAdamVR Profile">
+            <p>Root utility packages and links</p>
         </div>
     </div>
 
+    <!-- SUB PAGE: STANDALONE MODS (3 Links) -->
     <div id="standalone" class="page">
         <button class="back-btn" onclick="openPage('home')">← Back to Main Menu</button>
         
@@ -177,6 +181,7 @@
         </a>
     </div>
 
+    <!-- SUB PAGE: LIB FILES (1 Link, 1 File Download) -->
     <div id="libs" class="page">
         <button class="back-btn" onclick="openPage('home')">← Back to Main Menu</button>
 
@@ -190,6 +195,7 @@
         </a>
     </div>
 
+    <!-- SUB PAGE: ADB MODDING (1 Link, 2 File Downloads) -->
     <div id="adb" class="page">
         <button class="back-btn" onclick="openPage('home')">← Back to Main Menu</button>
 
@@ -207,6 +213,7 @@
         </a>
     </div>
 
+    <!-- SUB PAGE: MODDING DISCORDS (6 Links) -->
     <div id="discords" class="page">
         <button class="back-btn" onclick="openPage('home')">← Back to Main Menu</button>
 
@@ -236,6 +243,7 @@
         </a>
     </div>
 
+    <!-- SUB PAGE: ROOT TOOLS (2 Links) -->
     <div id="root" class="page">
         <button class="back-btn" onclick="openPage('home')">← Back to Main Menu</button>
 
@@ -249,6 +257,7 @@
         </a>
     </div>
 
+    <!-- Navigation Script -->
     <script>
         function openPage(pageId) {
             const pages = document.querySelectorAll('.page');
