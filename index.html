@@ -9,7 +9,9 @@
             box-sizing: border-box;
         }
         body {
-            background-color: #050b14;
+            /* Middle blue fading to black on the left and right sides */
+            background: linear-gradient(to right, #000000 0%, #020c1b 25%, #0a2d52 50%, #020c1b 75%, #000000 100%);
+            background-attachment: fixed;
             color: #e0f2fe;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             text-align: center;
@@ -17,6 +19,85 @@
             margin: 0;
             min-height: 100vh;
             position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Click to Enter Overlay */
+        #enter-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(3, 7, 18, 0.96);
+            backdrop-filter: blur(12px);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: opacity 0.6s ease, visibility 0.6s ease;
+        }
+        #enter-overlay.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+        .enter-box h2 {
+            font-size: 42px;
+            color: #ffffff;
+            margin: 0 0 10px 0;
+            text-shadow: 0 0 20px #00a2ff, 0 0 30px rgba(0, 162, 255, 0.6);
+            font-weight: 800;
+        }
+        .enter-box p {
+            font-size: 16px;
+            color: #38bdf8;
+            letter-spacing: 3px;
+            font-weight: bold;
+            margin: 0;
+            animation: pulse 1.5s infinite ease-in-out;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(0.97); }
+        }
+
+        /* Lightning Canvas Overlay */
+        #lightning-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .main-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Audio Toggle Button (Top Left) */
+        .audio-btn {
+            position: absolute;
+            top: 15px;
+            left: 20px;
+            background: rgba(13, 23, 42, 0.8);
+            color: #38bdf8;
+            border: 1px solid #00a2ff;
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            backdrop-filter: blur(5px);
+        }
+        .audio-btn:hover {
+            background: #00a2ff;
+            color: #ffffff;
+            box-shadow: 0 0 10px rgba(0, 162, 255, 0.6);
         }
         
         /* Top Corner Credits - Larger & Blue */
@@ -83,7 +164,8 @@
 
         /* Interactive Cards */
         .card {
-            background-color: #0d172a;
+            background-color: rgba(13, 23, 42, 0.85);
+            backdrop-filter: blur(8px);
             border-radius: 12px;
             padding: 16px 20px;
             margin: 14px auto;
@@ -130,7 +212,7 @@
 
         /* Back Button */
         .back-btn {
-            background: transparent;
+            background: rgba(13, 23, 42, 0.8);
             color: #38bdf8;
             border: 1px solid #00a2ff;
             padding: 8px 18px;
@@ -149,178 +231,212 @@
 </head>
 <body>
 
-    <!-- Credit in top right corner -->
-    <div class="credits">(credits to gemini for help)</div>
-
-    <!-- Main Profile Image & Dynamic Typing Header -->
-    <div class="profile-container">
-        <img src="avatar.jpg" class="profile-img" alt="OGAdamVR Profile">
-        <h1><span id="typewriter">OGAdamVR</span><span class="cursor">|</span></h1>
-    </div>
-
-    <!-- MAIN HOME PAGE -->
-    <div id="home" class="page active">
-        <div class="card" onclick="openPage('fangame')">
-            <h3>Fangame modding</h3>
-            <p>Mods, menus, and tools for VR fangames</p>
-        </div>
-
-        <div class="card" onclick="openPage('standalone')">
-            <h3>Standalone mods</h3>
-            <p>Custom mods for standalone VR</p>
-        </div>
-
-        <div class="card" onclick="openPage('libs')">
-            <h3>Lib files</h3>
-            <p>Library files and custom binaries</p>
-        </div>
-
-        <div class="card" onclick="openPage('adb')">
-            <h3>ADB modding</h3>
-            <p>ADB tools and modding scripts</p>
-        </div>
-
-        <div class="card" onclick="openPage('discords')">
-            <h3>Modding discords</h3>
-            <p>Community and modding Discord servers</p>
-        </div>
-
-        <div class="card" onclick="openPage('root')">
-            <h3>ROOT tools</h3>
-            <p>Root utility packages and links</p>
-        </div>
-
-        <div class="card" onclick="openPage('site-credits')">
-            <h3>Credits</h3>
-            <p>Site developers and contributors</p>
+    <!-- CLICK TO ENTER OVERLAY -->
+    <div id="enter-overlay" onclick="enterSite()">
+        <div class="enter-box">
+            <h2>OGAdamVR</h2>
+            <p>[ CLICK TO ENTER ]</p>
         </div>
     </div>
 
-    <!-- SUB PAGE: CREDITS -->
-    <div id="site-credits" class="page">
-        <button class="back-btn" onclick="openPage('home')">← Back to Main Menu</button>
+    <!-- Lightning Canvas Background -->
+    <canvas id="lightning-canvas"></canvas>
 
-        <div class="card info-card">
-            <h3>dev</h3>
-            <p>gemini ai</p>
+    <!-- Audio Element (Loads audio.mp3) -->
+    <audio id="bg-audio" src="audio.mp3" loop></audio>
+
+    <div class="main-content">
+        <!-- Audio Controls -->
+        <button class="audio-btn" id="audio-toggle" onclick="toggleAudio()">🔊 Play Audio</button>
+
+        <!-- Credit in top right corner -->
+        <div class="credits">(credits to gemini for help)</div>
+
+        <!-- Main Profile Image & Dynamic Typing Header -->
+        <div class="profile-container">
+            <img src="avatar.jpg" class="profile-img" alt="OGAdamVR Profile">
+            <h1><span id="typewriter">OGAdamVR</span><span class="cursor">|</span></h1>
         </div>
 
-        <div class="card info-card">
-            <h3>prompt giver</h3>
-            <p>OGAdamVR</p>
+        <!-- MAIN HOME PAGE -->
+        <div id="home" class="page active">
+            <div class="card" onclick="openPage('fangame')">
+                <h3>Fangame modding</h3>
+                <p>Mods, menus, and tools for VR fangames</p>
+            </div>
+
+            <div class="card" onclick="openPage('standalone')">
+                <h3>Standalone mods</h3>
+                <p>Custom mods for standalone VR</p>
+            </div>
+
+            <div class="card" onclick="openPage('libs')">
+                <h3>Lib files</h3>
+                <p>Library files and custom binaries</p>
+            </div>
+
+            <div class="card" onclick="openPage('adb')">
+                <h3>ADB modding</h3>
+                <p>ADB tools and modding scripts</p>
+            </div>
+
+            <div class="card" onclick="openPage('discords')">
+                <h3>Modding discords</h3>
+                <p>Community and modding Discord servers</p>
+            </div>
+
+            <div class="card" onclick="openPage('root')">
+                <h3>ROOT tools</h3>
+                <p>Root utility packages and links</p>
+            </div>
+
+            <div class="card" onclick="openPage('site-credits')">
+                <h3>Credits</h3>
+                <p>Site developers and contributors</p>
+            </div>
+        </div>
+
+        <!-- SUB PAGE: CREDITS -->
+        <div id="site-credits" class="page">
+            <button class="back-btn" onclick="openPage('home')">← Back to Main Menu</button>
+
+            <div class="card info-card">
+                <h3>dev</h3>
+                <p>gemini ai</p>
+            </div>
+
+            <div class="card info-card">
+                <h3>prompt giver</h3>
+                <p>OGAdamVR</p>
+            </div>
+        </div>
+
+        <!-- SUB PAGE: FANGAME MODDING (1 Link, 1 File Download) -->
+        <div id="fangame" class="page">
+            <button class="back-btn" onclick="openPage('home')">← Back to Main Menu</button>
+
+            <a href="https://example.com" target="_blank" class="card">
+                <h3>Fangame External Link</h3>
+                <p>Click to open external link</p>
+            </a>
+            <a href="fangame-mod.zip" download class="card download-card">
+                <h3>Download Fangame File</h3>
+                <p>Direct download package file</p>
+            </a>
+        </div>
+
+        <!-- SUB PAGE: STANDALONE MODS (3 Links) -->
+        <div id="standalone" class="page">
+            <button class="back-btn" onclick="openPage('home')">← Back to Main Menu</button>
+            
+            <a href="https://example.com" target="_blank" class="card">
+                <h3>Standalone Mod #1</h3>
+                <p>Click to visit link 1</p>
+            </a>
+            <a href="https://example.com" target="_blank" class="card">
+                <h3>Standalone Mod #2</h3>
+                <p>Click to visit link 2</p>
+            </a>
+            <a href="https://example.com" target="_blank" class="card">
+                <h3>Standalone Mod #3</h3>
+                <p>Click to visit link 3</p>
+            </a>
+        </div>
+
+        <!-- SUB PAGE: LIB FILES (1 Link, 1 File Download) -->
+        <div id="libs" class="page">
+            <button class="back-btn" onclick="openPage('home')">← Back to Main Menu</button>
+
+            <a href="https://example.com" target="_blank" class="card">
+                <h3>Lib External Link</h3>
+                <p>Click to visit site</p>
+            </a>
+            <a href="libfile.so" download class="card download-card">
+                <h3>Download Lib File</h3>
+                <p>Direct download file</p>
+            </a>
+        </div>
+
+        <!-- SUB PAGE: ADB MODDING (1 Link, 2 File Downloads) -->
+        <div id="adb" class="page">
+            <button class="back-btn" onclick="openPage('home')">← Back to Main Menu</button>
+
+            <a href="https://example.com" target="_blank" class="card">
+                <h3>ADB Modding Link</h3>
+                <p>Click to open external link</p>
+            </a>
+            <a href="adb-tool1.zip" download class="card download-card">
+                <h3>Download ADB Tool #1</h3>
+                <p>Direct download file 1</p>
+            </a>
+            <a href="adb-tool2.apk" download class="card download-card">
+                <h3>Download ADB Tool #2</h3>
+                <p>Direct download file 2</p>
+            </a>
+        </div>
+
+        <!-- SUB PAGE: MODDING DISCORDS (6 Links) -->
+        <div id="discords" class="page">
+            <button class="back-btn" onclick="openPage('home')">← Back to Main Menu</button>
+
+            <a href="https://discord.gg/example1" target="_blank" class="card">
+                <h3>Discord Server #1</h3>
+                <p>Join Discord community 1</p>
+            </a>
+            <a href="https://discord.gg/example2" target="_blank" class="card">
+                <h3>Discord Server #2</h3>
+                <p>Join Discord community 2</p>
+            </a>
+            <a href="https://discord.gg/example3" target="_blank" class="card">
+                <h3>Discord Server #3</h3>
+                <p>Join Discord community 3</p>
+            </a>
+            <a href="https://discord.gg/example4" target="_blank" class="card">
+                <h3>Discord Server #4</h3>
+                <p>Join Discord community 4</p>
+            </a>
+            <a href="https://discord.gg/example5" target="_blank" class="card">
+                <h3>Discord Server #5</h3>
+                <p>Join Discord community 5</p>
+            </a>
+            <a href="https://discord.gg/example6" target="_blank" class="card">
+                <h3>Discord Server #6</h3>
+                <p>Join Discord community 6</p>
+            </a>
+        </div>
+
+        <!-- SUB PAGE: ROOT TOOLS (2 Links) -->
+        <div id="root" class="page">
+            <button class="back-btn" onclick="openPage('home')">← Back to Main Menu</button>
+
+            <a href="https://example.com" target="_blank" class="card">
+                <h3>ROOT Tool Link #1</h3>
+                <p>Click to open root link 1</p>
+            </a>
+            <a href="https://example.com" target="_blank" class="card">
+                <h3>ROOT Tool Link #2</h3>
+                <p>Click to open root link 2</p>
+            </a>
         </div>
     </div>
 
-    <!-- SUB PAGE: FANGAME MODDING (1 Link, 1 File Download) -->
-    <div id="fangame" class="page">
-        <button class="back-btn" onclick="openPage('home')">← Back to Main Menu</button>
-
-        <a href="https://example.com" target="_blank" class="card">
-            <h3>Fangame External Link</h3>
-            <p>Click to open external link</p>
-        </a>
-        <a href="fangame-mod.zip" download class="card download-card">
-            <h3>Download Fangame File</h3>
-            <p>Direct download package file</p>
-        </a>
-    </div>
-
-    <!-- SUB PAGE: STANDALONE MODS (3 Links) -->
-    <div id="standalone" class="page">
-        <button class="back-btn" onclick="openPage('home')">← Back to Main Menu</button>
-        
-        <a href="https://example.com" target="_blank" class="card">
-            <h3>Standalone Mod #1</h3>
-            <p>Click to visit link 1</p>
-        </a>
-        <a href="https://example.com" target="_blank" class="card">
-            <h3>Standalone Mod #2</h3>
-            <p>Click to visit link 2</p>
-        </a>
-        <a href="https://example.com" target="_blank" class="card">
-            <h3>Standalone Mod #3</h3>
-            <p>Click to visit link 3</p>
-        </a>
-    </div>
-
-    <!-- SUB PAGE: LIB FILES (1 Link, 1 File Download) -->
-    <div id="libs" class="page">
-        <button class="back-btn" onclick="openPage('home')">← Back to Main Menu</button>
-
-        <a href="https://example.com" target="_blank" class="card">
-            <h3>Lib External Link</h3>
-            <p>Click to visit site</p>
-        </a>
-        <a href="libfile.so" download class="card download-card">
-            <h3>Download Lib File</h3>
-            <p>Direct download file</p>
-        </a>
-    </div>
-
-    <!-- SUB PAGE: ADB MODDING (1 Link, 2 File Downloads) -->
-    <div id="adb" class="page">
-        <button class="back-btn" onclick="openPage('home')">← Back to Main Menu</button>
-
-        <a href="https://example.com" target="_blank" class="card">
-            <h3>ADB Modding Link</h3>
-            <p>Click to open external link</p>
-        </a>
-        <a href="adb-tool1.zip" download class="card download-card">
-            <h3>Download ADB Tool #1</h3>
-            <p>Direct download file 1</p>
-        </a>
-        <a href="adb-tool2.apk" download class="card download-card">
-            <h3>Download ADB Tool #2</h3>
-            <p>Direct download file 2</p>
-        </a>
-    </div>
-
-    <!-- SUB PAGE: MODDING DISCORDS (6 Links) -->
-    <div id="discords" class="page">
-        <button class="back-btn" onclick="openPage('home')">← Back to Main Menu</button>
-
-        <a href="https://discord.gg/example1" target="_blank" class="card">
-            <h3>Discord Server #1</h3>
-            <p>Join Discord community 1</p>
-        </a>
-        <a href="https://discord.gg/example2" target="_blank" class="card">
-            <h3>Discord Server #2</h3>
-            <p>Join Discord community 2</p>
-        </a>
-        <a href="https://discord.gg/example3" target="_blank" class="card">
-            <h3>Discord Server #3</h3>
-            <p>Join Discord community 3</p>
-        </a>
-        <a href="https://discord.gg/example4" target="_blank" class="card">
-            <h3>Discord Server #4</h3>
-            <p>Join Discord community 4</p>
-        </a>
-        <a href="https://discord.gg/example5" target="_blank" class="card">
-            <h3>Discord Server #5</h3>
-            <p>Join Discord community 5</p>
-        </a>
-        <a href="https://discord.gg/example6" target="_blank" class="card">
-            <h3>Discord Server #6</h3>
-            <p>Join Discord community 6</p>
-        </a>
-    </div>
-
-    <!-- SUB PAGE: ROOT TOOLS (2 Links) -->
-    <div id="root" class="page">
-        <button class="back-btn" onclick="openPage('home')">← Back to Main Menu</button>
-
-        <a href="https://example.com" target="_blank" class="card">
-            <h3>ROOT Tool Link #1</h3>
-            <p>Click to open root link 1</p>
-        </a>
-        <a href="https://example.com" target="_blank" class="card">
-            <h3>ROOT Tool Link #2</h3>
-            <p>Click to open root link 2</p>
-        </a>
-    </div>
-
-    <!-- Scripts for Navigation and Typewriter Animation -->
+    <!-- JavaScript Navigation, Typewriter, Audio & Lightning -->
     <script>
+        // Enter Screen Handler (Plays audio on click)
+        function enterSite() {
+            const overlay = document.getElementById('enter-overlay');
+            overlay.classList.add('hidden');
+
+            const audio = document.getElementById('bg-audio');
+            const audioBtn = document.getElementById('audio-toggle');
+            
+            audio.play().then(() => {
+                audioBtn.textContent = '⏸️ Pause Audio';
+            }).catch(e => {
+                console.log('Audio playback blocked');
+            });
+        }
+
         // Page Navigation Logic
         function openPage(pageId) {
             const pages = document.querySelectorAll('.page');
@@ -329,7 +445,7 @@
             window.scrollTo(0, 0);
         }
 
-        // Typewriter Effect switching between OGAdamVR and Modding Hub
+        // Typewriter Effect
         const words = ["OGAdamVR", "Modding Hub"];
         let wordIndex = 0;
         let charIndex = words[0].length;
@@ -350,19 +466,96 @@
             let speed = isDeleting ? 90 : 130;
 
             if (!isDeleting && charIndex === currentWord.length) {
-                speed = 2200; // Pause at full word
+                speed = 2200;
                 isDeleting = true;
             } else if (isDeleting && charIndex === 0) {
                 isDeleting = false;
                 wordIndex = (wordIndex + 1) % words.length;
-                speed = 400; // Pause before re-typing
+                speed = 400;
             }
 
             setTimeout(typeEffect, speed);
         }
-
-        // Start typing loop after 2 seconds
         setTimeout(typeEffect, 2000);
+
+        // Audio Player Logic
+        const audio = document.getElementById('bg-audio');
+        const audioBtn = document.getElementById('audio-toggle');
+
+        function toggleAudio() {
+            if (audio.paused) {
+                audio.play().then(() => {
+                    audioBtn.textContent = '⏸️ Pause Audio';
+                }).catch(e => {
+                    console.log('Audio playback blocked');
+                });
+            } else {
+                audio.pause();
+                audioBtn.textContent = '🔊 Play Audio';
+            }
+        }
+
+        // Animated Lightning Generator
+        const canvas = document.getElementById('lightning-canvas');
+        const ctx = canvas.getContext('2d');
+        let bolts = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        function createLightning() {
+            const startX = Math.random() * canvas.width;
+            const startY = 0;
+            let currentX = startX;
+            let currentY = startY;
+            const segments = [];
+
+            while (currentY < canvas.height * (0.4 + Math.random() * 0.4)) {
+                const nextX = currentX + (Math.random() - 0.5) * 60;
+                const nextY = currentY + Math.random() * 25 + 10;
+                segments.push({ x1: currentX, y1: currentY, x2: nextX, y2: nextY });
+                currentX = nextX;
+                currentY = nextY;
+            }
+
+            bolts.push({ segments: segments, alpha: 1.0 });
+        }
+
+        function drawLightning() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            for (let i = bolts.length - 1; i >= 0; i--) {
+                const bolt = bolts[i];
+                ctx.beginPath();
+                ctx.strokeStyle = `rgba(56, 189, 248, ${bolt.alpha})`;
+                ctx.lineWidth = 2;
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = '#00a2ff';
+
+                bolt.segments.forEach(seg => {
+                    ctx.moveTo(seg.x1, seg.y1);
+                    ctx.lineTo(seg.x2, seg.y2);
+                });
+
+                ctx.stroke();
+                bolt.alpha -= 0.05;
+
+                if (bolt.alpha <= 0) {
+                    bolts.splice(i, 1);
+                }
+            }
+
+            if (Math.random() < 0.025) {
+                createLightning();
+            }
+
+            requestAnimationFrame(drawLightning);
+        }
+        drawLightning();
     </script>
 
 </body>
